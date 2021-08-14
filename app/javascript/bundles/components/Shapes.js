@@ -1,19 +1,43 @@
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fabric } from 'fabric'
+
 
 const Shapes = (props) => {
-  const [name, setName] = useState(props.name);
+  const [canvas, setCanvas] = useState('')
+
+  useEffect(() => {
+    setCanvas(initCanvas());
+  }, [])
+
+  const initCanvas = () => (
+    new fabric.Canvas('canvas', {
+      height: 800,
+      width: 800,
+      backgroundColor: '#ffa733'
+    })
+  )
+
+  const addRect = () => {
+    const rect = new fabric.Rect({
+      height: 200,
+      width: 280,
+      fill: 'yellow'
+    });
+    canvas.add(rect);
+    canvas.renderAll();
+  }
+
+  const addText = () => {
+    const text = new fabric.Text('hello world', { left: 100, top: 100 });
+    canvas.add(text);
+    canvas.renderAll();
+  }
 
   return (
     <div>
-      <h3>Hello, {name}!</h3>
-      <hr />
-      <form>
-        <label htmlFor="name">
-          Say hello to:
-          <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
-        </label>
-      </form>
+      <button onClick={() => addText(canvas)}>Text</button>
+      <button onClick={() => addRect(canvas)}>Rectangle</button>
+      <canvas id='canvas' />
     </div>
   );
 };
