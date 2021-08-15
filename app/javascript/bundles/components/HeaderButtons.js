@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { CanvasInfo } from './Shapes'
-import addStartRect from './../models/StartRect'
+import addRect from '../models/Rect'
 import addRectWithArrow from './../models/RectWithArrow'
 
 const HeaderButtons = () => {
@@ -8,8 +8,8 @@ const HeaderButtons = () => {
   return (
     <div>
       {/* <button onClick={() => addText()}>Text</button> */}
-      <button onClick={() => addStartRect(canvas)}>Rectangle</button>
-      <button onClick={() => addRectWithArrow(canvas, selectedShapeSite)}>Line</button>
+      <button onClick={() => addRect(canvas)}>Rectangle</button>
+      <button onClick={() => addRectWithArrow(canvas, selectedShapeSite)}>addRectWithArrow</button>
     </div>
   )
 }
