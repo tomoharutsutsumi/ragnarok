@@ -1,10 +1,11 @@
-import { newRect } from './Rect'
+import { newRect, RIGHT } from './Rect'
 import { fabric } from 'fabric'
 
-const addRectWithArrow = (canvas, selectedShapeSite) => {
+const addRectWithArrow = (canvas, selectedShapeSite, connectLine) => {
   const { x, y } = selectedShapeSite
   const line = new fabric.Path(`M ${x + 100} ${y + 50} L ${x + 300} ${y + 50}`, { fill: '', stroke: 'black', objectCaching: false });
-  const rect = newRect(y, x + 300)
+  connectLine.current = line
+  const rect = newRect({ top: y, left: x + 300, point: RIGHT })
   canvas.add(line);
   canvas.add(rect);
   canvas.renderAll();
