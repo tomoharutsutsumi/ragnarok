@@ -1,16 +1,14 @@
 import React, { useState, useEffect, createContext, useRef } from 'react';
 import { fabric } from 'fabric'
 import HeaderButtons from './HeaderButtons'
-import { LEFT, RIGHT } from './../models/Rect'
+import { LEFT, RIGHT, MIDDLE } from './../models/Rect'
 
 export const CanvasInfo = createContext()
 
 const Shapes = (props) => {
   const [canvas, setCanvas] = useState(null)
-  // const [selectedShape, setSelectedShape] = useState(null)
   const selectedShape = useRef()
   const connectLine = useRef()
-  // const [connectLine, setConnectLine] = useState(null)
   const [selectedShapeSite, setSelectedShapeSite] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
@@ -19,39 +17,72 @@ const Shapes = (props) => {
 
   useEffect(() => {
     function connectShapes({ target }) {
-     
       // console.log(selectedShape.current)
-      // setSelectedShape(target) 新しくオブジェクトを作ったときにlineというpropertyに値を入れたい
-      console.log(selectedShape.current)
-      console.log(target)
-      if (selectedShape.current && !selectedShape.current.line) {
-        selectedShape.current.line = connectLine.current
+      // console.log(connectLine.current)
+      if (selectedShape.current && selectedShape.current.type === 'Rect') {
+        if (selectedShape.current && !(selectedShape.current.lines.length === 0)) {
+          // console.log(connectLine.current.id)
+          // // console.log(selectedShape.current)
+          if (!(selectedShape.current.lines.filter(line => line !== undefined).some(line => line.id === connectLine.current.id))) {
+            selectedShape.current.lines.push(connectLine.current)
+          } 
+          // else {
+          //   selectedShape.current.lines.push(connectLine.current)
+          // }
+        }
       }
-      if (!target.line) {
-        target.line = connectLine.current
+      // if (!target.id) {
+      //   console.log(shapeId.current)
+      //   target.id = shapeId
+      // }
+      if (target.type === 'Rect') {
+        if (target.lines.length === 0) {
+          target.lines.push(connectLine.current)
+        } else {
+          if (!target.lines.some(line => line.id === connectLine.current.id)) {
+            target.lines.push(connectLine.current)
+          }
+        }
       }
       // console.log(target)
-      // selectedShape.line = connectLine
+      // console.log(selectedShape)
+
+      if (selectedShape.current && selectedShape.current.point === RIGHT ) {
+        // console.log(selectedShape.current)
+        selectedShape.current.point = MIDDLE
+      }
+      // shapeId.current = shapeId.current + 1
     }
     const keepConnection = ({ target }) => {
-      // console.log(target)
-      // console.log(target.connectLine && target.point === RIGHT)
-      if (target.line && target.point === LEFT) {
-        target.line.path[0][1] = target.left
-        target.line.path[0][2] = target.top + 50
-      } else if (target.line && target.point === RIGHT) {
-        target.line.path[1][1] = target.left
-        target.line.path[1][2] = target.top + 50
+      console.log(target)
+      if (target.lines && target.point === LEFT) {
+        target.lines[1].path[0][1] = target.left
+        target.lines[1].path[0][2] = target.top + 50
+      } else if (target.lines && target.point === RIGHT) {
+        target.lines[0].path[1][1] = target.left
+        target.lines[0].path[1][2] = target.top + 50
+      } else if (target.lines && target.point === MIDDLE) {
+        target.lines.map(line => {
+          // console.log(line)
+          // console.log(line.leftRect.current.id === target.id)
+          // console.log(line.rightRect.id === target.id)
+          if (line.leftRectId === target.id) {
+            line.path[0][1] = target.left
+            line.path[0][2] = target.top + 50
+          } else if (line.rightRectId === target.id) {
+            line.path[1][1] = target.left
+            line.path[1][2] = target.top + 50
+          }
+        })
+        // target.line.path[0][1] = target.left
+        // target.line.path[0][2] = target.top + 50
+        // target.line.path[1][1] = target.left  //middleはついている全てのlineが動くから、どのラインが動くかを判定する必要はない？
+        // target.line.path[1][2] = target.top + 50
       }
     }
     function handleShapeEvents({ target }) {
       if(target) {
-        
-        // setSelectedShape(target)
-        // console.log(target)
         selectedShape.current = target
-        // console.log(target)
-        // keepConnection(target)
         setSelectedShapeSite({ ...selectedShapeSite, x: target.left, y: target.top })
       } else {
         return;
@@ -80,7 +111,7 @@ const Shapes = (props) => {
 
   return (
     <div>
-      <CanvasInfo.Provider value={{ canvas, selectedShapeSite, connectLine }}>
+      <CanvasInfo.Provider value={{ canvas, selectedShape, selectedShapeSite, connectLine }}>
         <HeaderButtons />
       </CanvasInfo.Provider>
       <canvas id='canvas' />
@@ -89,8 +120,4 @@ const Shapes = (props) => {
 };
 
 export default Shapes
-
-// HelloWorld.propTypes = {
-//   name: PropTypes.string.isRequired, // this is passed from the Rails view
-// };
 
