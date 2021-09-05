@@ -17,24 +17,14 @@ const Shapes = (props) => {
 
   useEffect(() => {
     function connectShapes({ target }) {
-      // console.log(selectedShape.current)
-      // console.log(connectLine.current)
       if (selectedShape.current && selectedShape.current.type === 'Rect') {
         if (selectedShape.current && !(selectedShape.current.lines.length === 0)) {
-          // console.log(connectLine.current.id)
-          // // console.log(selectedShape.current)
           if (!(selectedShape.current.lines.filter(line => line !== undefined).some(line => line.id === connectLine.current.id))) {
             selectedShape.current.lines.push(connectLine.current)
           } 
-          // else {
-          //   selectedShape.current.lines.push(connectLine.current)
-          // }
         }
       }
-      // if (!target.id) {
-      //   console.log(shapeId.current)
-      //   target.id = shapeId
-      // }
+
       if (target.type === 'Rect') {
         if (target.lines.length === 0) {
           target.lines.push(connectLine.current)
@@ -44,18 +34,14 @@ const Shapes = (props) => {
           }
         }
       }
-      // console.log(target)
-      // console.log(selectedShape)
 
       if (selectedShape.current && selectedShape.current.point === RIGHT ) {
-        // console.log(selectedShape.current)
         selectedShape.current.point = MIDDLE
       }
-      // shapeId.current = shapeId.current + 1
     }
+
     const keepConnection = ({ target }) => {
-      console.log(target)
-      if (target.lines && target.point === LEFT) {
+      if (target.lines && target.lines.some(line => line !== undefined) && target.point === LEFT) {
         target.lines[1].path[0][1] = target.left
         target.lines[1].path[0][2] = target.top + 50
       } else if (target.lines && target.point === RIGHT) {
@@ -63,9 +49,6 @@ const Shapes = (props) => {
         target.lines[0].path[1][2] = target.top + 50
       } else if (target.lines && target.point === MIDDLE) {
         target.lines.map(line => {
-          // console.log(line)
-          // console.log(line.leftRect.current.id === target.id)
-          // console.log(line.rightRect.id === target.id)
           if (line.leftRectId === target.id) {
             line.path[0][1] = target.left
             line.path[0][2] = target.top + 50
@@ -74,12 +57,16 @@ const Shapes = (props) => {
             line.path[1][2] = target.top + 50
           }
         })
-        // target.line.path[0][1] = target.left
-        // target.line.path[0][2] = target.top + 50
-        // target.line.path[1][1] = target.left  //middleはついている全てのlineが動くから、どのラインが動くかを判定する必要はない？
-        // target.line.path[1][2] = target.top + 50
+      }
+
+      if (target.text && target.type == 'Rect') {
+        target.text.left = target.left
+        target.text.top = target.top
+        target.setCoords()
+        target.text.setCoords()
       }
     }
+
     function handleShapeEvents({ target }) {
       if(target) {
         selectedShape.current = target
@@ -89,25 +76,39 @@ const Shapes = (props) => {
       }
     }
 
+    function selectText({target}) {
+      if (target && target.type === 'Text') {
+        canvas.setActiveObject(target)
+        canvas.renderAll();
+      }
+    }
+
+    function unselectText({target}) {
+      if (target && target.type === 'Text') {
+        canvas.discardActiveObject(target)
+        canvas.renderAll();
+      }
+    }
+
     if(canvas) {
       canvas.on({
         'selection:created': handleShapeEvents,
         'selection:updated': handleShapeEvents,
         'object:moving': keepConnection,
         'object:added':connectShapes,
+        'mouse:over': selectText,
+        'mouse:out': unselectText
       })
     }
   }, [canvas])
 
   const initCanvas = () => (
     new fabric.Canvas('canvas', {
-      height: 800,
+      height: 1600,
       width: 1600,
       backgroundColor: '#ffa733'
     })
   )
-
-  
 
   return (
     <div>

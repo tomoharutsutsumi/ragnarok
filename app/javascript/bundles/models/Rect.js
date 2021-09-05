@@ -10,20 +10,22 @@ export const newRect = ({ top = 100, left = 100, point }) => {
     id: uuidv4(),
     top: top,
     left: left,
-    height: 100,
-    width: 100,
+    height: 200,
+    width: 200,
     fill: 'yellow',
     point: point,
     lines: [],
-    type: 'Rect'
+    type: 'Rect',
   });
   return rect
 }
 
 const addRect = (canvas) => {
   const rect  = newRect({ point: LEFT })
-  // console.log(rect.id)
+  const text = new fabric.IText('hello world', { left: 100, top: 100, type: 'Text',backgroundColor: 'red' });
+  rect.text = text
   canvas.add(rect);
+  canvas.add(text);
   canvas.renderAll();
 }
 
